@@ -37,7 +37,13 @@ funciona aunque se abra en otro navegador (por ejemplo, fuera de Instagram):
 `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/panel`.
 En Authentication → URL Configuration, poner `Site URL` = `https://reutilizalo.shop`.
 
-Para hacerte admin: `update public.profile_private set is_admin = true where id = '<tu user id>';`
+Para hacerte admin, crea tu tienda y después corre en el SQL Editor de Supabase (con tu email):
+
+```sql
+update public.profile_private
+set is_admin = true
+where id = (select id from auth.users where email = 'tu-email@ejemplo.com');
+```
 
 ## Pendiente antes del lanzamiento
 
