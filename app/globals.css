@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de diseño (docs/reutilizalo-mvp.md §8).
+ * El token "bg" de la spec se llama "canvas" para evitar la clase `bg-bg`.
+ * `--accent` se puede sobrescribir por tienda (accent_color de los vendedores Pro).
+ */
+:root {
+  --accent: #17784b;
+  --accent-hover: #0f5a37;
+}
+
+@theme inline {
+  --color-canvas: #f3f5f1;
+  --color-surface: #ffffff;
+  --color-ink: #14201a;
+  --color-ink-muted: #4f5b54;
+  --color-ink-soft: #2e3a33;
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-highlight: #ffd45c;
+  --color-chip-off: #eef0ec;
+  --color-line: #d6dcd7;
+
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 20px;
+  --radius-button: 14px;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink-soft);
+  font-family: var(--font-sans);
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+}
