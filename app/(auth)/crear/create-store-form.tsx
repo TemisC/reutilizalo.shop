@@ -55,6 +55,7 @@ export function CreateStoreForm({ intro }: { intro: ReactNode }) {
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const latestCheck = useRef(0);
 
   // Verificación en vivo con debounce.
@@ -275,6 +276,46 @@ export function CreateStoreForm({ intro }: { intro: ReactNode }) {
         </ul>
 
         <div className="mt-auto flex flex-col gap-5 pt-4">
+          <div className="flex flex-col gap-2">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="acceptTerms"
+                checked={acceptTerms}
+                onChange={(event) => setAcceptTerms(event.target.checked)}
+                aria-invalid={Boolean(errors.acceptTerms)}
+                aria-describedby={describedBy("acceptTerms")}
+                className="mt-0.5 size-6 shrink-0 accent-[var(--accent)]"
+              />
+              <span className="text-ink-soft">
+                Acepto los{" "}
+                <Link
+                  href="/terminos"
+                  target="_blank"
+                  className="font-bold text-accent underline underline-offset-2"
+                >
+                  Términos de uso
+                </Link>{" "}
+                y la{" "}
+                <Link
+                  href="/privacidad"
+                  target="_blank"
+                  className="font-bold text-accent underline underline-offset-2"
+                >
+                  Política de privacidad
+                </Link>
+                . Entiendo que Reutilizalo solo ofrece el espacio para vender y
+                no participa en las negociaciones ni en las transacciones entre
+                las partes.
+              </span>
+            </label>
+            {errors.acceptTerms && (
+              <FieldError id="acceptTerms-error">
+                {errors.acceptTerms}
+              </FieldError>
+            )}
+          </div>
+
           {state.message && <FieldError>{state.message}</FieldError>}
           <Button
             type="submit"
@@ -284,17 +325,6 @@ export function CreateStoreForm({ intro }: { intro: ReactNode }) {
           >
             Crear mi tienda
           </Button>
-          <p className="text-center text-sm text-ink-muted">
-            Al crear tu tienda aceptas los{" "}
-            <Link href="/terminos" className="underline underline-offset-2">
-              Términos de uso
-            </Link>{" "}
-            y la{" "}
-            <Link href="/privacidad" className="underline underline-offset-2">
-              Política de privacidad
-            </Link>
-            .
-          </p>
           <p className="text-center text-ink-muted">
             ¿Ya tienes cuenta?{" "}
             <Link

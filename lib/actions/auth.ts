@@ -41,6 +41,8 @@ const createStoreSchema = z.object({
   whatsapp: z.string().trim().min(1, "Necesitamos tu WhatsApp para que te escriban."),
   email: z.email("Revisa tu email."),
   password: z.string().min(8, "Usa al menos 8 caracteres."),
+  // Casilla obligatoria: el navegador manda "on" solo si está marcada.
+  acceptTerms: z.literal("on", "Para crear tu tienda tienes que aceptar los Términos de uso."),
 });
 
 export type CreateStoreField = keyof z.infer<typeof createStoreSchema>;
@@ -93,7 +95,8 @@ export async function createStore(
     email,
     password,
     options: {
-      data: { nick, store_name: storeName, whatsapp },
+      // terms_accepted_at queda en los metadatos del usuario como constancia de la aceptación.
+      data: { nick, store_name: storeName, whatsapp, terms_accepted_at: new Date().toISOString() },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/panel`,
     },
   });

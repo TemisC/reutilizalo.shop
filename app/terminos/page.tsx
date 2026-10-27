@@ -22,6 +22,14 @@ export default function TermsPage() {
         </p>
       }
     >
+      <aside className="rounded-3xl bg-highlight/40 p-5 text-ink ring-2 ring-highlight">
+        <p className="font-bold">
+          El equipo de reutilizalo.shop solo ofrece un espacio para que las personas puedan vender sus pertenencias
+          de segunda mano. No nos hacemos responsables de las negociaciones ni de las transacciones que se realicen
+          entre las partes.
+        </p>
+      </aside>
+
       <LegalSection title="1. Qué es Reutilizalo">
         <p>
           Reutilizalo te da una tiendita con un link propio (reutilizalo.shop/tunombre) para mostrar tus artículos

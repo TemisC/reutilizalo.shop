@@ -56,6 +56,16 @@ export function ItemDetailView({ page, item }: { page: StorePage; item: PublicIt
               </a>
             )}
 
+            {!sold && (
+              <p className="-mt-2 text-center text-sm text-ink-muted">
+                Reutilizalo solo conecta a las personas: el precio, el pago y la entrega los acuerdas directo con
+                quien vende.{" "}
+                <Link href="/terminos" className="underline underline-offset-2">
+                  Más info
+                </Link>
+              </p>
+            )}
+
             {item.defects && (
               <section className="rounded-3xl bg-highlight/40 p-4">
                 <h2 className="font-sans text-base font-bold tracking-normal">Detalles que tiene</h2>
