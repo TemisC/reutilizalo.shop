@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { requireSeller, type Seller } from "@/lib/auth/session";
 import { logout } from "@/lib/actions/auth";
-import { greetingName, initialOf } from "@/lib/site";
+import { initialOf } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
 import { PanelNav } from "./panel-nav";
@@ -35,25 +35,30 @@ export function PanelSidebarView({ seller }: { seller: Seller }) {
           </section>
         )}
 
-        <div className="flex items-center gap-3 px-1">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent font-display text-lg font-extrabold text-white">
-            {initialOf(seller.storeName)}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-bold">{greetingName(seller.storeName)}</p>
-            <p className="text-sm text-white/70">{seller.plan === "pro" ? "Plan Pro" : "Plan gratis"}</p>
+        <section aria-label="Mi cuenta" className="flex flex-col gap-3 rounded-3xl bg-white/8 p-4">
+          <p className="text-xs font-medium uppercase tracking-[0.12em] text-white/60">Mi cuenta</p>
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent font-display text-lg font-extrabold text-white">
+              {initialOf(seller.storeName)}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold leading-snug break-words">{seller.storeName}</p>
+              <p className="text-sm text-white/70">{seller.plan === "pro" ? "Plan Pro" : "Plan gratis"}</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-0.5 text-sm text-white/70">
+            <p className="break-all">@{seller.nick}</p>
+            {seller.email && <p className="break-all">{seller.email}</p>}
           </div>
           <form action={logout}>
             <button
               type="submit"
-              aria-label="Cerrar sesión"
-              title="Cerrar sesión"
-              className="flex size-10 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              className="flex min-h-10 w-full items-center justify-center gap-2 rounded-full text-sm font-bold text-white/80 ring-1 ring-white/20 transition-colors hover:bg-white/10 hover:text-white"
             >
-              <LogOut className="size-5" aria-hidden />
+              <LogOut className="size-4" aria-hidden /> Cerrar sesión
             </button>
           </form>
-        </div>
+        </section>
       </div>
     </aside>
   );

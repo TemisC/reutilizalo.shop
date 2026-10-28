@@ -7,6 +7,7 @@ export type Seller = {
   id: string;
   nick: string;
   storeName: string;
+  email: string;
   /** Plan vigente: un Pro vencido cuenta como Gratis (igual que effective_plan() en la base). */
   plan: "free" | "pro";
   itemLimit: number;
@@ -39,6 +40,7 @@ export const requireSeller = cache(async (): Promise<Seller> => {
     id: profile.id,
     nick: profile.nick,
     storeName: profile.store_name,
+    email: typeof claimsData?.claims?.email === "string" ? claimsData.claims.email : "",
     plan,
     itemLimit: PLAN_LIMITS[plan],
   };

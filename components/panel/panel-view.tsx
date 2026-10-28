@@ -33,7 +33,12 @@ export function PanelView({ seller, items, reputation, reviews }: Props) {
       {/* En computadora la navegación está en el menú lateral. */}
       <header className="flex items-center justify-between lg:hidden">
         <Logo />
-        <AccountMenu nick={seller.nick} initial={initialOf(seller.storeName)} />
+        <AccountMenu
+          nick={seller.nick}
+          initial={initialOf(seller.storeName)}
+          storeName={seller.storeName}
+          email={seller.email}
+        />
       </header>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
