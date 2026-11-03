@@ -22,7 +22,7 @@ export function PanelSidebarView({ seller }: { seller: Seller }) {
     <aside className="sticky top-0 hidden h-dvh w-62 shrink-0 flex-col gap-8 overflow-y-auto bg-ink p-5 text-white lg:flex">
       <Logo tone="light" className="px-3 pt-3 text-2xl" />
 
-      <PanelNav nick={seller.nick} />
+      <PanelNav nick={seller.nick} isAdmin={seller.isAdmin} />
 
       <div className="mt-auto flex flex-col gap-5">
         {seller.plan === "free" && (

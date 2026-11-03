@@ -38,6 +38,7 @@ export function PanelView({ seller, items, reputation, reviews }: Props) {
           initial={initialOf(seller.storeName)}
           storeName={seller.storeName}
           email={seller.email}
+          isAdmin={seller.isAdmin}
         />
       </header>
 

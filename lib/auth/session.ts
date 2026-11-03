@@ -11,6 +11,8 @@ export type Seller = {
   /** Plan vigente: un Pro vencido cuenta como Gratis (igual que effective_plan() en la base). */
   plan: "free" | "pro";
   itemLimit: number;
+  /** Cuenta del equipo de Reutilizalo (profile_private.is_admin). */
+  isAdmin: boolean;
 };
 
 /**
@@ -31,6 +33,12 @@ export const requireSeller = cache(async (): Promise<Seller> => {
 
   if (!profile) redirect("/crear");
 
+  const { data: privateData } = await supabase
+    .from("profile_private")
+    .select("is_admin")
+    .eq("id", userId)
+    .maybeSingle();
+
   const isPro =
     profile.plan === "pro" &&
     (!profile.plan_expires_at || new Date(profile.plan_expires_at) > new Date());
@@ -43,5 +51,13 @@ export const requireSeller = cache(async (): Promise<Seller> => {
     email: typeof claimsData?.claims?.email === "string" ? claimsData.claims.email : "",
     plan,
     itemLimit: PLAN_LIMITS[plan],
+    isAdmin: privateData?.is_admin === true,
   };
 });
+
+/** Como requireSeller, pero solo para el equipo de Reutilizalo: al resto lo manda a su panel. */
+export async function requireAdmin(): Promise<Seller> {
+  const seller = await requireSeller();
+  if (!seller.isAdmin) redirect("/panel");
+  return seller;
+}

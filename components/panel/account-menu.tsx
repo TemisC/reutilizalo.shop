@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, Store } from "lucide-react";
+import { ChartColumn, LogOut, Store } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 
 export function AccountMenu({
@@ -10,11 +10,13 @@ export function AccountMenu({
   initial,
   storeName,
   email,
+  isAdmin = false,
 }: {
   nick: string;
   initial: string;
   storeName: string;
   email: string;
+  isAdmin?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -50,6 +52,11 @@ export function AccountMenu({
             <Link href={`/${nick}`} role="menuitem" className={menuItem}>
               <Store className="size-4" aria-hidden /> Ver mi tienda
             </Link>
+            {isAdmin && (
+              <Link href="/admin" role="menuitem" className={menuItem}>
+                <ChartColumn className="size-4" aria-hidden /> Administración
+              </Link>
+            )}
             <form action={logout}>
               <button type="submit" role="menuitem" className={`${menuItem} w-full`}>
                 <LogOut className="size-4" aria-hidden /> Cerrar sesión
