@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChartColumn, LogOut, Store } from "lucide-react";
+import { ChartColumn, LogOut, Settings, Store } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 
 export function AccountMenu({
@@ -51,6 +51,9 @@ export function AccountMenu({
             </div>
             <Link href={`/${nick}`} role="menuitem" className={menuItem}>
               <Store className="size-4" aria-hidden /> Ver mi tienda
+            </Link>
+            <Link href="/panel/configuracion" role="menuitem" className={menuItem}>
+              <Settings className="size-4" aria-hidden /> Configuración
             </Link>
             {isAdmin && (
               <Link href="/admin" role="menuitem" className={menuItem}>

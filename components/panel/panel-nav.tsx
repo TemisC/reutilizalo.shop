@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChartColumn, House, LayoutGrid, Plus, Square, Star, type LucideIcon } from "lucide-react";
+import { ChartColumn, House, LayoutGrid, Plus, Settings, Square, Star, type LucideIcon } from "lucide-react";
 
 export function PanelNav({ nick, isAdmin }: { nick: string; isAdmin: boolean }) {
   const pathname = usePathname();
@@ -23,6 +23,12 @@ export function PanelNav({ nick, isAdmin }: { nick: string; isAdmin: boolean }) 
     },
     { href: "/panel#calificaciones", label: "Calificaciones", icon: Star, active: false },
     { href: `/${nick}`, label: "Mi tienda", icon: Square, active: false },
+    {
+      href: "/panel/configuracion",
+      label: "Configuración",
+      icon: Settings,
+      active: pathname === "/panel/configuracion",
+    },
   ];
   if (isAdmin) {
     links.push({

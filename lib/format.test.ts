@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatScore, formatUYU, toE164 } from "./format";
+import { formatScore, formatUYU, splitE164, toE164 } from "./format";
 
 describe("formatUYU", () => {
   it("agrupa miles con punto", () => {
@@ -24,5 +24,17 @@ describe("toE164", () => {
   });
   it("rechaza números inválidos", () => {
     expect(toE164("+598", "12")).toBeNull();
+  });
+});
+
+describe("splitE164", () => {
+  it("separa el prefijo uruguayo y vuelve a poner el 0", () => {
+    expect(splitE164("+59899123456")).toEqual({ countryCode: "+598", localNumber: "099 123 456" });
+  });
+  it("es reversible con toE164", () => {
+    const { countryCode, localNumber } = splitE164("+59899123456");
+    expect(toE164(countryCode, localNumber)).toBe("+59899123456");
+    const other = splitE164("+5491112345678");
+    expect(toE164(other.countryCode, other.localNumber)).toBe("+5491112345678");
   });
 });

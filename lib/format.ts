@@ -25,3 +25,22 @@ export function toE164(countryCode: string, localNumber: string): string | null 
   const full = `+${cc}${digits}`;
   return /^\+[1-9][0-9]{7,14}$/.test(full) ? full : null;
 }
+
+/**
+ * Lo inverso de toE164, para mostrar el número en un formulario:
+ * "+59899123456" → { countryCode: "+598", localNumber: "099 123 456" }.
+ * Fuera de Uruguay no sabemos dónde termina el prefijo: tomamos 2 dígitos, que es lo más común.
+ * Igual es reversible, porque toE164 solo une prefijo y número.
+ */
+export function splitE164(e164: string): { countryCode: string; localNumber: string } {
+  if (e164.startsWith(DEFAULT_COUNTRY_CODE)) {
+    const digits = e164.slice(DEFAULT_COUNTRY_CODE.length);
+    const local = `0${digits}`;
+    return {
+      countryCode: DEFAULT_COUNTRY_CODE,
+      localNumber: local.length === 9 ? `${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}` : local,
+    };
+  }
+  const digits = e164.replace(/^\+/, "");
+  return { countryCode: `+${digits.slice(0, 2)}`, localNumber: digits.slice(2) };
+}

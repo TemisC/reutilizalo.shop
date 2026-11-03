@@ -33,7 +33,7 @@ export function StoreView({ page }: { page: StorePage }) {
                   className="lg:size-28! lg:text-5xl!"
                 />
                 <div className="min-w-0">
-                  <h1 className="text-[1.9rem] leading-[1.05] lg:text-[2.2rem]">{store.storeName}</h1>
+                  <h1 className={`leading-[1.05] [overflow-wrap:anywhere] ${storeNameSize(store.storeName)}`}>{store.storeName}</h1>
                   <p className="mt-1 text-ink-muted">
                     @{store.nick}
                     {place && ` · ${place}`}
@@ -93,4 +93,15 @@ function paymentLabel(link: string) {
     // Link inválido: igual mostramos el chip genérico.
   }
   return "Acepta pago con link";
+}
+
+/**
+ * Los nombres con palabras muy largas ("CosasSecondHand") achican la letra para entrar en el recuadro;
+ * si igual no entran, se cortan (overflow-wrap) en lugar de salirse.
+ */
+function storeNameSize(name: string) {
+  const longestWord = Math.max(...name.split(/\s+/).map((word) => word.length));
+  if (longestWord > 14) return "text-[1.5rem] lg:text-[1.7rem]";
+  if (longestWord > 11) return "text-[1.7rem] lg:text-[1.95rem]";
+  return "text-[1.9rem] lg:text-[2.2rem]";
 }
