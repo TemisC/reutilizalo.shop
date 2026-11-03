@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { PRO_PRICE_UYU } from "@/lib/catalog";
 import { formatUYU } from "@/lib/format";
+import { PRO_PLAN_WHATSAPP_LINK } from "@/lib/whatsapp";
 import { buttonClasses } from "@/components/ui/button";
 import { ReserveLinkForm } from "@/components/landing/reserve-link-form";
 import { PhoneMockup } from "@/components/landing/phone-mockup";
@@ -142,7 +143,7 @@ export default function Home() {
                 price={formatUYU(PRO_PRICE_UYU)}
                 per="/mes"
                 features={PRO_FEATURES}
-                cta={{ href: "/crear", label: "Empezar con Plan Pro" }}
+                cta={{ href: PRO_PLAN_WHATSAPP_LINK, label: "Empezar con Plan Pro", external: true }}
               />
             </div>
           </div>
@@ -177,9 +178,10 @@ function PlanCard({
   price: string;
   per?: string;
   features: string[];
-  cta: { href: string; label: string };
+  cta: { href: string; label: string; external?: boolean };
 }) {
   const dark = tone === "dark";
+  const ctaClass = `${buttonClasses(dark ? "secondary" : "dark", "lg")} mt-auto ${dark ? "bg-white! hover:bg-chip-off!" : ""}`;
   return (
     <article
       className={`flex flex-col gap-5 rounded-3xl p-7 ${dark ? "bg-white/8 text-white" : "bg-highlight text-ink"}`}
@@ -196,9 +198,15 @@ function PlanCard({
           <li key={feature}>{feature}</li>
         ))}
       </ul>
-      <Link href={cta.href} className={`${buttonClasses(dark ? "secondary" : "dark", "lg")} mt-auto ${dark ? "bg-white! hover:bg-chip-off!" : ""}`}>
-        {cta.label}
-      </Link>
+      {cta.external ? (
+        <a href={cta.href} target="_blank" rel="noopener noreferrer" className={ctaClass}>
+          <MessageCircle className="size-5" aria-hidden /> {cta.label}
+        </a>
+      ) : (
+        <Link href={cta.href} className={ctaClass}>
+          {cta.label}
+        </Link>
+      )}
     </article>
   );
 }
