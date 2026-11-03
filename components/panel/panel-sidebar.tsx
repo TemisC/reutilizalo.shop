@@ -2,7 +2,6 @@ import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { requireSeller, type Seller } from "@/lib/auth/session";
 import { logout } from "@/lib/actions/auth";
-import { initialOf } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
 import { PanelNav } from "./panel-nav";
@@ -37,16 +36,11 @@ export function PanelSidebarView({ seller }: { seller: Seller }) {
 
         <section aria-label="Mi cuenta" className="flex flex-col gap-3 rounded-3xl bg-white/8 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-white/60">Mi cuenta</p>
-          <div className="flex items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent font-display text-lg font-extrabold text-white">
-              {initialOf(seller.storeName)}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-bold leading-snug break-words">{seller.storeName}</p>
-              <p className="text-sm text-white/70">{seller.plan === "pro" ? "Plan Pro" : "Plan gratis"}</p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-0.5 text-sm text-white/70">
+          <div className="flex min-w-0 flex-col gap-0.5 text-sm text-white/70">
+            <p className={`truncate font-bold leading-snug text-white ${nameSize(seller.storeName)}`} title={seller.storeName}>
+              {seller.storeName}
+            </p>
+            <p>{seller.plan === "pro" ? "Plan Pro" : "Plan gratis"}</p>
             <p className="break-all">@{seller.nick}</p>
             {seller.email && <p className="break-all">{seller.email}</p>}
           </div>
@@ -62,4 +56,11 @@ export function PanelSidebarView({ seller }: { seller: Seller }) {
       </div>
     </aside>
   );
+}
+
+/** El nombre va en una sola línea: los largos achican la letra y, si igual no entran, terminan en "…". */
+function nameSize(name: string) {
+  if (name.length <= 18) return "text-base";
+  if (name.length <= 24) return "text-sm";
+  return "text-xs";
 }

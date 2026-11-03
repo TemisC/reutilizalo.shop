@@ -53,6 +53,8 @@ where id = (select id from auth.users where email = 'tu-email@ejemplo.com');
 - **Cierre de cuenta:** la Política de privacidad promete borrar la tienda, los artículos y las fotos
   cuando alguien cierra su cuenta. Por ahora se hace a mano (borrar el usuario en Supabase Auth borra sus
   datos en cascada; las fotos de Storage hay que borrarlas aparte).
+- **Tamaños en celular:** al usuario le parece que en la versión de celular los textos y botones se ven
+  muy grandes. Revisar la escala (títulos, botones, tarjetas) a 390 px.
 
 ## Scripts
 
