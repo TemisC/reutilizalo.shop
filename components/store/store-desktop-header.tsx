@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { LayoutDashboard } from "lucide-react";
 import { storeUrl } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
+import { SessionSwitch } from "@/components/ui/session-switch";
 import { ShareButton } from "./share-button";
 import { StoreLinkPill } from "./store-link-pill";
 
@@ -20,14 +22,23 @@ export function StoreDesktopHeader({ nick, title }: { nick: string; title: strin
           <Link href="/explorar" className="flex min-h-11 items-center rounded-full px-4 font-bold text-ink hover:bg-canvas">
             Explorar
           </Link>
-          <Link
-            href="/crear"
-            className="flex min-h-11 items-center whitespace-nowrap rounded-full bg-ink px-5 font-bold text-white transition-colors hover:bg-ink/85"
-          >
-            Crear mi tienda
-          </Link>
+          <SessionSwitch
+            guest={
+              <Link href="/crear" className={ctaClass}>
+                Crear mi tienda
+              </Link>
+            }
+            member={
+              <Link href="/panel" className={ctaClass}>
+                <LayoutDashboard className="size-4" aria-hidden /> Mi panel
+              </Link>
+            }
+          />
         </nav>
       </div>
     </header>
   );
 }
+
+const ctaClass =
+  "flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-ink px-5 font-bold text-white transition-colors hover:bg-ink/85";

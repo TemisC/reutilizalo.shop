@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
+import { SessionSwitch } from "@/components/ui/session-switch";
 
 /** Ancho de las páginas institucionales (landing, términos, privacidad). */
 export const SITE_CONTAINER = "mx-auto w-full max-w-6xl px-5 md:px-10";
@@ -15,19 +16,30 @@ export function SiteHeader() {
         <Link href="/#planes" className={navLink}>
           Planes
         </Link>
-        <Link href="/login" className={navLink}>
-          Iniciar sesión
-        </Link>
-        <Link
-          href="/crear"
-          className="ml-1 flex min-h-11 items-center rounded-full bg-ink px-5 font-bold text-white transition-colors hover:bg-ink-soft"
-        >
-          Crear mi tienda
-        </Link>
+        <SessionSwitch
+          guest={
+            <>
+              <Link href="/login" className={navLink}>
+                Iniciar sesión
+              </Link>
+              <Link href="/crear" className={ctaClass}>
+                Crear mi tienda
+              </Link>
+            </>
+          }
+          member={
+            <Link href="/panel" className={ctaClass}>
+              Mi panel
+            </Link>
+          }
+        />
       </nav>
     </header>
   );
 }
+
+const ctaClass =
+  "ml-1 flex min-h-11 items-center rounded-full bg-ink px-5 font-bold text-white transition-colors hover:bg-ink-soft";
 
 const navLink = "flex min-h-11 items-center rounded-full px-3 text-ink-soft transition-colors hover:bg-surface hover:text-ink";
 
