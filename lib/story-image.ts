@@ -6,19 +6,20 @@
 
 /**
  * Frases de la línea chica del recuadro negro, donde se pega el sticker "Enlace".
- * Varían entre historia e historia para que no se vean todas iguales.
+ * Varían entre historia e historia para que no se vean todas iguales. Van con voseo uruguayo
+ * ("tocá", "escribime") porque son la voz de quien comparte en su propia historia.
  */
 export const STORY_PHRASES = [
-  "Toca el enlace para verlo",
-  "¿Lo quieres? Toca el enlace",
-  "Toca el enlace y escríbeme",
+  "Tocá el enlace para verlo",
+  "¿Lo querés? Tocá el enlace",
+  "Tocá el enlace y escribime",
   "Más fotos y detalles en el enlace",
-  "Toca el enlace antes de que se vaya",
-  "Míralo en mi tienda: toca el enlace",
-  "Toca el enlace para ver el precio y más",
-  "¿Te interesa? Toca el enlace",
-  "Toca el enlace y mira más cosas",
-  "Lo vendo: toca el enlace",
+  "Tocá el enlace antes de que vuele",
+  "Miralo en mi tienda: tocá el enlace",
+  "Tocá el enlace para ver el precio y más",
+  "¿Te interesa? Tocá el enlace",
+  "Tocá el enlace y mirá más cosas",
+  "Lo vendo: tocá el enlace",
 ] as const;
 
 /** Una frase al azar, distinta de `previous` si se pasa. */
