@@ -1,7 +1,6 @@
 /**
  * Dominio público, sin espacios ni barra final: un salto de línea pegado por error en la variable
- * de Vercel rompía todos los links copiados ("https://reutilizalo.shop
-/temis").
+ * de Vercel rompía todos los links copiados ("https://reutilizalo.shop⏎/temis").
  */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://reutilizalo.shop").trim().replace(/\/+$/, "");
 
