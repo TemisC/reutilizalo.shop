@@ -19,7 +19,7 @@ export const STORY_PHRASES = [
   "Tocá el enlace para ver el precio y más",
   "¿Te interesa? Tocá el enlace",
   "Tocá el enlace y mirá más cosas",
-  "Lo vendo: tocá el enlace",
+  "¿Lo querés? Tocá el enlace",
 ] as const;
 
 /** Una frase al azar, distinta de `previous` si se pasa. */
