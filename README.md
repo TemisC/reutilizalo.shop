@@ -55,6 +55,9 @@ where id = (select id from auth.users where email = 'tu-email@ejemplo.com');
   datos en cascada; las fotos de Storage hay que borrarlas aparte).
 - **Tamaños en celular:** al usuario le parece que en la versión de celular los textos y botones se ven
   muy grandes. Revisar la escala (títulos, botones, tarjetas) a 390 px.
+- **Variable en Vercel:** en Settings → Environment Variables, `NEXT_PUBLIC_SITE_URL` tiene un salto de
+  línea al final. Dejarla exactamente `https://reutilizalo.shop` y hacer Redeploy. El código ya lo limpia
+  (`lib/site.ts`), así que no rompe nada mientras tanto.
 
 ## Scripts
 
