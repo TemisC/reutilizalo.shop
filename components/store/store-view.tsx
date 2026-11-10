@@ -6,6 +6,7 @@ import { StoreAvatar } from "./store-avatar";
 import { ReputationBlock } from "./reputation-block";
 import { StoreCatalog } from "./store-catalog";
 import { CreateStoreBanner, ExploreCard, MadeWithFooter } from "./growth";
+import { EXPLORE_OPEN } from "@/lib/catalog";
 import { StoreTheme } from "./store-theme";
 import { STORE_CONTAINER, StoreDesktopHeader } from "./store-desktop-header";
 
@@ -57,7 +58,8 @@ export function StoreView({ page }: { page: StorePage }) {
 
         <div className="mt-4 flex flex-col gap-4 lg:mt-10">
           <CreateStoreBanner />
-          {store.showExploreLink && <ExploreCard />}
+          {/* Mientras Explorar está cerrado no sacamos a los compradores de la tienda hacia una página vacía. */}
+          {EXPLORE_OPEN && store.showExploreLink && <ExploreCard />}
           <MadeWithFooter />
         </div>
       </div>

@@ -192,7 +192,7 @@ export function ProCard() {
       <p className="text-sm font-bold uppercase tracking-[0.12em]">Plan Pro</p>
       <h2 className="text-3xl leading-tight">¿Tienes más de 5 cosas para vender?</h2>
       <p>
-        Publica hasta 50 artículos y aparece en Explorar, donde te ve mucha más gente. {formatUYU(PRO_PRICE_UYU)} al mes.
+        Publica hasta 50 artículos y ve cuántas visitas recibe cada uno. {formatUYU(PRO_PRICE_UYU)} al mes.
       </p>
       <Link href="/#planes" className={`${buttonClasses("dark", "lg")} mt-2`}>
         Ver planes

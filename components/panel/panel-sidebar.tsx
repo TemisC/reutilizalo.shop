@@ -4,6 +4,8 @@ import { requireSeller, type Seller } from "@/lib/auth/session";
 import { logout } from "@/lib/actions/auth";
 import { Logo } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
+import { PRO_PRICE_UYU } from "@/lib/catalog";
+import { formatUYU } from "@/lib/format";
 import { PanelNav } from "./panel-nav";
 
 /** Contenedor de las páginas del panel: columna de celular, ancho completo junto al menú en computadora. */
@@ -27,7 +29,7 @@ export function PanelSidebarView({ seller }: { seller: Seller }) {
         {seller.plan === "free" && (
           <section className="flex flex-col gap-3 rounded-3xl bg-highlight p-5 text-ink">
             <p className="text-sm font-bold uppercase tracking-[0.12em]">Plan Pro</p>
-            <p>Hasta 50 artículos y apareces en Explorar.</p>
+            <p>Hasta 50 artículos en tu tienda por {formatUYU(PRO_PRICE_UYU)} al mes.</p>
             <Link href="/#planes" className={buttonClasses("dark")}>
               Ver planes
             </Link>

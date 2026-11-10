@@ -57,12 +57,14 @@ const BENEFITS = [
   },
 ];
 
-const FREE_FEATURES = ["Hasta 5 artículos publicados", "Tu link reutilizalo.shop/tunombre", "Botón directo a tu WhatsApp"];
+const FREE_FEATURES = [
+  "Hasta 5 artículos publicados",
+  "Hasta 10 si invitas a otras tiendas", "Tu link reutilizalo.shop/tunombre", "Botón directo a tu WhatsApp"];
 
+// Por ahora el Pro es más lugar en la vitrina. Explorar y el resto llegan con el Pro Plus.
 const PRO_FEATURES = [
-  "Hasta 50 artículos",
-  "Tus artículos aparecen en Explorar",
-  "Elige el color de tu tienda",
+  "Hasta 50 artículos en tu tienda",
+  "Espacio para todo lo que quieras vender",
   "Ve cuántas visitas recibe cada artículo",
 ];
 

@@ -44,5 +44,11 @@ export const PLAN_LIMITS = { free: 5, pro: 50 } as const;
 export const REFERRAL_MAX_BONUS = 5;
 export const FREE_MAX_WITH_REFERRALS = 10;
 
+/**
+ * Explorar queda cerrado (página "en construcción") hasta tener masa crítica de vendedores:
+ * ~100 tiendas con algo publicado y ~500 artículos activos. Ahí se abre junto con el Plan Pro Plus.
+ */
+export const EXPLORE_OPEN = false;
+
 /** Precio mensual del Plan Pro en pesos uruguayos. Cambiarlo acá lo actualiza en toda la app. */
-export const PRO_PRICE_UYU = 290;
+export const PRO_PRICE_UYU = 149;

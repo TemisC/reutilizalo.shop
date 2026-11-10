@@ -121,8 +121,8 @@ export default function TermsPage() {
             El plan Gratis permite tener hasta {PLAN_LIMITS.free} artículos activos, sin costo y sin vencimiento.
           </li>
           <li>
-            El Plan Pro permite hasta {PLAN_LIMITS.pro} artículos activos y suma beneficios como aparecer en Explorar,
-            elegir el color de la tienda y ver estadísticas. Cuesta {formatUYU(PRO_PRICE_UYU)} por mes.
+            El Plan Pro permite hasta {PLAN_LIMITS.pro} artículos activos y ver cuántas visitas recibe cada artículo.
+            Cuesta {formatUYU(PRO_PRICE_UYU)} por mes.
           </li>
           <li>
             Si un Plan Pro vence, la tienda vuelve al plan Gratis. Ningún artículo se borra y los que ya estaban
