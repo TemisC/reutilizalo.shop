@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft, TriangleAlert } from "lucide-react";
-import type { AdminStats, AdminStore } from "@/lib/data/admin";
+import type { AdminReferralStats, AdminReferrer, AdminStats, AdminStore } from "@/lib/data/admin";
 import { PRO_PRICE_UYU } from "@/lib/catalog";
 import { formatUYU } from "@/lib/format";
 import { Logo } from "@/components/ui/logo";
 import { SignupsChart } from "./signups-chart";
+import { ReferralsSection } from "./referrals-section";
 
 const dateLabel = new Intl.DateTimeFormat("es-UY", {
   day: "numeric",
@@ -26,7 +27,15 @@ function percent(part: number, total: number) {
   return total === 0 ? "–" : `${Math.round((part / total) * 100)} %`;
 }
 
-export function AdminView({ stats, stores }: { stats: AdminStats; stores: AdminStore[] }) {
+type Props = {
+  stats: AdminStats;
+  stores: AdminStore[];
+  /** null si la base todavía no tiene la migración de invitaciones. */
+  referralStats: AdminReferralStats | null;
+  referrers: AdminReferrer[] | null;
+};
+
+export function AdminView({ stats, stores, referralStats, referrers }: Props) {
   return (
     <>
       <header className="flex items-center justify-between lg:hidden">
@@ -97,6 +106,14 @@ export function AdminView({ stats, stores }: { stats: AdminStats; stores: AdminS
           </p>
         </section>
       </div>
+
+      {referralStats && referrers ? (
+        <ReferralsSection stats={referralStats} referrers={referrers} />
+      ) : (
+        <p className="rounded-3xl bg-surface p-5 text-ink-muted">
+          Las estadísticas de invitaciones aparecen cuando se ejecuta la migración de referidos en Supabase.
+        </p>
+      )}
 
       <section className="flex flex-col gap-3 lg:rounded-3xl lg:bg-surface lg:p-8">
         <div className="flex items-baseline justify-between gap-3">

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth/session";
-import { getAdminStats, getAdminStores } from "@/lib/data/admin";
+import { getAdminReferralStats, getAdminReferrers, getAdminStats, getAdminStores } from "@/lib/data/admin";
 import { AdminView } from "@/components/admin/admin-view";
 import { PANEL_CONTAINER } from "@/components/panel/panel-sidebar";
 
@@ -22,8 +22,14 @@ export default function AdminPage() {
 
 async function AdminContent() {
   await requireAdmin();
-  const [stats, stores] = await Promise.all([getAdminStats(), getAdminStores()]);
-  return <AdminView stats={stats} stores={stores} />;
+  const [stats, stores, referralStats, referrers] = await Promise.all([
+    getAdminStats(),
+    getAdminStores(),
+    // Si todavía no se ejecutó la migración de invitaciones, el resto del tablero sigue funcionando.
+    getAdminReferralStats().catch(() => null),
+    getAdminReferrers().catch(() => null),
+  ]);
+  return <AdminView stats={stats} stores={stores} referralStats={referralStats} referrers={referrers} />;
 }
 
 function AdminSkeleton() {

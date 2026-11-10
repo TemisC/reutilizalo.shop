@@ -36,5 +36,13 @@ export type PhotoKind = (typeof PHOTO_SLOTS)[number]["kind"];
 
 export const PLAN_LIMITS = { free: 5, pro: 50 } as const;
 
+/**
+ * Invitaciones: cada tienda invitada que publica su primer artículo le suma 1 lugar gratis a quien
+ * la invitó (hasta 5), y la invitada también gana 1. El plan gratis nunca pasa de 10.
+ * Deben coincidir con plan_item_limit() en supabase/migrations; la base es la que decide.
+ */
+export const REFERRAL_MAX_BONUS = 5;
+export const FREE_MAX_WITH_REFERRALS = 10;
+
 /** Precio mensual del Plan Pro en pesos uruguayos. Cambiarlo acá lo actualiza en toda la app. */
 export const PRO_PRICE_UYU = 490;

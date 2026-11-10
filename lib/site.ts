@@ -5,6 +5,11 @@ export function storeUrl(nick: string) {
   return `${SITE_URL}/${nick}`;
 }
 
+/** Link para invitar a otra persona a crear su tienda. */
+export function inviteUrl(nick: string) {
+  return `${SITE_URL}/crear?ref=${nick}`;
+}
+
 /** Link tal como se muestra en pantalla: siempre "reutilizalo.shop/nick". */
 export function storeLinkLabel(nick: string) {
   return `reutilizalo.shop/${nick}`;

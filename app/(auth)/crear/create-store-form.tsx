@@ -9,7 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Check, LoaderCircle, MailCheck } from "lucide-react";
+import { Check, Gift, LoaderCircle, MailCheck } from "lucide-react";
 import {
   checkNickAvailability,
   createStore,
@@ -17,7 +17,7 @@ import {
   type CreateStoreState,
   type NickStatus,
 } from "@/lib/actions/auth";
-import { NICK_PROBLEM_MESSAGES, normalizeNick } from "@/lib/nick";
+import { NICK_PROBLEM_MESSAGES, nickProblem, normalizeNick } from "@/lib/nick";
 import { DEFAULT_COUNTRY_CODE } from "@/lib/format";
 import { initialOf } from "@/lib/site";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,11 @@ export function CreateStoreForm({ intro }: { intro: ReactNode }) {
   const [nick, setNick] = useState(() =>
     normalizeNick(searchParams.get("nick") ?? ""),
   );
+  // Link de invitación: /crear?ref=nick de la tienda que lo invitó.
+  const [ref] = useState(() => {
+    const value = normalizeNick(searchParams.get("ref") ?? "");
+    return nickProblem(value) ? "" : value;
+  });
   const [nickStatus, setNickStatus] = useState<LiveStatus>("idle");
   const [storeName, setStoreName] = useState("");
   const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE);
@@ -106,6 +111,18 @@ export function CreateStoreForm({ intro }: { intro: ReactNode }) {
         className="flex flex-1 flex-col gap-7"
         noValidate
       >
+        {ref && (
+          <>
+            <input type="hidden" name="ref" value={ref} />
+            <p className="flex items-start gap-3 rounded-2xl bg-highlight p-4 text-ink">
+              <Gift className="mt-0.5 size-5 shrink-0" aria-hidden />
+              <span>
+                <strong>Te invitó @{ref}.</strong> Cuando publiques tu primer artículo, ganas un lugar
+                extra: 6 artículos gratis en vez de 5.
+              </span>
+            </p>
+          </>
+        )}
         <div className="flex flex-col gap-2">
           <label htmlFor="nick" className="font-bold text-ink">
             Tu link

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSeller } from "@/lib/auth/session";
+import { freeLimitText } from "@/components/panel/invite-card";
 import { countActiveItems } from "@/lib/data/items";
 import { BackButton } from "@/components/ui/back-button";
 import { buttonClasses } from "@/components/ui/button";
@@ -53,7 +54,7 @@ async function PublishContent() {
           <h2 className="text-2xl">Llegaste a tu límite de artículos</h2>
           <p>
             {seller.plan === "free"
-              ? "Con el plan gratis puedes tener 5 artículos activos. Marca alguno como vendido u ocúltalo, o pásate a Pro para publicar hasta 50."
+              ? freeLimitText(seller.itemLimit)
               : "Marca alguno como vendido u ocúltalo para publicar otro."}
           </p>
           <Link href="/panel" className={buttonClasses("dark", "lg")}>

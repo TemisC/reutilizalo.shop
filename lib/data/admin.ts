@@ -90,3 +90,89 @@ export async function getAdminStores(limit = 100): Promise<AdminStore[]> {
     wantClicks: Number(row.want_clicks),
   }));
 }
+
+/** Tiendas que llegaron con link de invitación frente a las que llegaron solas. */
+export type ReferralGroup = {
+  total: number;
+  /** Publicaron al menos un artículo alguna vez. */
+  published: number;
+  /** Nunca publicaron y tienen más de 7 días: cuentas fantasma. */
+  empty: number;
+  /** Nunca publicaron pero tienen menos de 7 días: todavía pueden hacerlo. */
+  recent: number;
+};
+
+export type AdminReferralStats = {
+  referred: ReferralGroup;
+  organic: ReferralGroup;
+  /** Lugares gratis extra entregados entre todas las tiendas del plan gratis. */
+  bonusSlots: number;
+};
+
+export type AdminReferrer = {
+  id: string;
+  nick: string;
+  storeName: string;
+  invited: number;
+  published: number;
+  empty: number;
+  recent: number;
+  bonus: number;
+  /** Invitadas con el mismo WhatsApp que quien invita (no suman lugares). */
+  sameWhatsapp: number;
+  /** Invitadas con un email casi igual al de quien invita o al de otra invitada. */
+  similarEmail: number;
+  /** Invitadas creadas a menos de 10 minutos de otra invitada. */
+  burst: number;
+  lastInvitedAt: string;
+};
+
+export async function getAdminReferralStats(): Promise<AdminReferralStats> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_referral_stats");
+  if (error || !data) throw new Error(`No se pudieron leer los referidos: ${error?.message ?? "sin datos"}`);
+
+  const raw = data as Record<string, unknown>;
+  const group = (prefix: string): ReferralGroup => ({
+    total: Number(raw[`${prefix}_total`] ?? 0),
+    published: Number(raw[`${prefix}_published`] ?? 0),
+    empty: Number(raw[`${prefix}_empty`] ?? 0),
+    recent: Number(raw[`${prefix}_recent`] ?? 0),
+  });
+  return { referred: group("referred"), organic: group("organic"), bonusSlots: Number(raw.bonus_slots ?? 0) };
+}
+
+export async function getAdminReferrers(limit = 100): Promise<AdminReferrer[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_list_referrers", { p_limit: limit });
+  if (error) throw new Error(`No se pudo leer la lista de referidos: ${error.message}`);
+
+  type Row = {
+    id: string;
+    nick: string;
+    store_name: string;
+    invited: number;
+    published: number;
+    empty: number;
+    recent: number;
+    bonus: number;
+    same_whatsapp: number;
+    similar_email: number;
+    burst: number;
+    last_invited_at: string;
+  };
+  return ((data ?? []) as Row[]).map((row) => ({
+    id: row.id,
+    nick: row.nick,
+    storeName: row.store_name,
+    invited: Number(row.invited),
+    published: Number(row.published),
+    empty: Number(row.empty),
+    recent: Number(row.recent),
+    bonus: Number(row.bonus),
+    sameWhatsapp: Number(row.same_whatsapp),
+    similarEmail: Number(row.similar_email),
+    burst: Number(row.burst),
+    lastInvitedAt: row.last_invited_at,
+  }));
+}

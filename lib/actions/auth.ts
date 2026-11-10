@@ -43,6 +43,8 @@ const createStoreSchema = z.object({
   password: z.string().min(8, "Usa al menos 8 caracteres."),
   // Casilla obligatoria: el navegador manda "on" solo si está marcada.
   acceptTerms: z.literal("on", "Para crear tu tienda tienes que aceptar los Términos de uso."),
+  // Nick de la tienda que lo invitó (link /crear?ref=nick). La base ignora uno que no existe.
+  ref: z.string().optional().transform((value) => (value ? normalizeNick(value) : "")),
 });
 
 export type CreateStoreField = keyof z.infer<typeof createStoreSchema>;
@@ -68,6 +70,7 @@ export async function createStore(
   }
 
   const { nick, storeName, countryCode, email, password } = parsed.data;
+  const ref = parsed.data.ref && !nickProblem(parsed.data.ref) && parsed.data.ref !== nick ? parsed.data.ref : null;
   const errors: CreateStoreState["errors"] = {};
 
   const problem = nickProblem(nick);
@@ -96,7 +99,13 @@ export async function createStore(
     password,
     options: {
       // terms_accepted_at queda en los metadatos del usuario como constancia de la aceptación.
-      data: { nick, store_name: storeName, whatsapp, terms_accepted_at: new Date().toISOString() },
+      data: {
+        nick,
+        store_name: storeName,
+        whatsapp,
+        terms_accepted_at: new Date().toISOString(),
+        ...(ref ? { ref } : {}),
+      },
       emailRedirectTo: `${siteUrl}/auth/confirm?next=/panel`,
     },
   });

@@ -9,6 +9,7 @@ import { Logo } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
 import { CopyLinkButton } from "@/components/panel/copy-link-button";
 import { AccountMenu } from "@/components/panel/account-menu";
+import { InviteCard, freeLimitText } from "@/components/panel/invite-card";
 import {
   ItemsTableHead,
   ItemRow,
@@ -25,7 +26,7 @@ export function PanelView({ seller, items, reputation, reviews }: Props) {
   const atLimit = activeCount >= seller.itemLimit;
   const limitMessage =
     seller.plan === "free"
-      ? "Llegaste a tus 5 artículos gratis. Marca alguno como vendido u ocúltalo, o pásate a Pro para publicar hasta 50."
+      ? freeLimitText(seller.itemLimit)
       : "Llegaste al máximo de artículos activos de tu plan.";
 
   return (
@@ -100,7 +101,10 @@ export function PanelView({ seller, items, reputation, reviews }: Props) {
           )}
         </section>
 
-        <RecentReviews reviews={reviews} />
+        <div className="flex flex-col gap-6">
+          {seller.plan === "free" && <InviteCard seller={seller} />}
+          <RecentReviews reviews={reviews} />
+        </div>
       </div>
 
       {seller.plan === "free" && (
