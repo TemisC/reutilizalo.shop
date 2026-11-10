@@ -164,15 +164,23 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
                 <Step n={3}>
                   Ponlo en el espacio punteado, debajo de la frase: así quien la vea entra directo al artículo.
                 </Step>
+                <Step n={4}>
+                  <span className="flex flex-col items-start gap-2">
+                    <span>Mensaje de tu historia:</span>
+                    <strong aria-live="polite" className="rounded-xl bg-ink px-3 py-2 text-highlight">
+                      {phrase ?? "…"}
+                    </strong>
+                    <button
+                      type="button"
+                      onClick={() => build(randomPhrase(phrase ?? undefined))}
+                      disabled={!file && !failed}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-chip-off px-4 font-bold text-ink transition-colors hover:bg-line disabled:opacity-60"
+                    >
+                      <RefreshCw className="size-4" aria-hidden /> Otra frase
+                    </button>
+                  </span>
+                </Step>
               </ol>
-              <button
-                type="button"
-                onClick={() => build(randomPhrase(phrase ?? undefined))}
-                disabled={!file && !failed}
-                className="inline-flex min-h-11 items-center gap-2 self-start rounded-full bg-chip-off px-4 text-sm font-bold text-ink transition-colors hover:bg-line disabled:opacity-60"
-              >
-                <RefreshCw className="size-4" aria-hidden /> Otra frase
-              </button>
             </div>
           </div>
 
