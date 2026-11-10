@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, Copy, Download, LoaderCircle, Share2, X } from "lucide-react";
-import { renderStoryImage, type StoryData } from "@/lib/story-image";
+import { Check, Copy, Download, LoaderCircle, RefreshCw, Share2, X } from "lucide-react";
+import { randomPhrase, renderStoryImage, type StoryData } from "@/lib/story-image";
 
-type Props = Omit<StoryData, "accent"> & {
+type Props = Omit<StoryData, "accent" | "phrase"> & {
   /** Link completo del artículo: se copia para pegarlo en el sticker "Enlace" de la historia. */
   url: string;
   /** "icon": botón cuadrado junto a "Lo quiero" en la grilla; "full": botón ancho en la página del artículo. */
@@ -25,20 +25,26 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
   const [failed, setFailed] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [canShareFiles, setCanShareFiles] = useState(false);
+  const [phrase, setPhrase] = useState<string | null>(null);
 
   useEffect(() => {
     if (!preview) return;
     return () => URL.revokeObjectURL(preview);
   }, [preview]);
 
-  async function open() {
-    dialogRef.current?.showModal();
-    if (file) return;
+  async function build(nextPhrase: string) {
+    setPhrase(nextPhrase);
+    setFile(null);
+    setPreview(null);
     setFailed(null);
     try {
       // Las tiendas Pro pueden tener su propio color: se toma del botón, que está dentro del tema.
       const accent = getComputedStyle(triggerRef.current!).getPropertyValue("--accent").trim() || "#17784b";
-      const blob = await renderStoryImage({ ...story, accent });
+      const blob = await renderStoryImage({
+        ...story,
+        phrase: nextPhrase,
+        accent,
+      });
       const next = new File([blob], `reutilizalo-${story.title.slice(0, 30).replace(/[^\w]+/g, "-")}.png`, {
         type: "image/png",
       });
@@ -48,6 +54,12 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
     } catch (error) {
       setFailed(error instanceof Error ? error.message : String(error));
     }
+  }
+
+  function open() {
+    dialogRef.current?.showModal();
+    // Cada vez que se abre sale una frase nueva, así las historias no se ven todas iguales.
+    build(randomPhrase(phrase ?? undefined));
   }
 
   function copyLink() {
@@ -131,7 +143,7 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
           </div>
 
           <div className="flex gap-4">
-            <div className="relative aspect-[9/16] w-28 shrink-0 overflow-hidden rounded-2xl bg-chip-off">
+            <div className="relative aspect-[9/16] w-28 shrink-0 self-start overflow-hidden rounded-2xl bg-chip-off">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element -- es una imagen generada en el momento (blob:)
                 <img src={preview} alt="Vista previa de la historia" className="size-full object-cover" />
@@ -141,15 +153,27 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
                 </span>
               )}
             </div>
-            <ol className="flex flex-col gap-3 text-sm">
-              <Step n={1}>
-                Toca <strong>Compartir</strong> y elige <strong>Instagram → Historia</strong>.
-              </Step>
-              <Step n={2}>
-                En la historia, toca el sticker <strong>Enlace</strong> y pega el link: ya te lo copiamos.
-              </Step>
-              <Step n={3}>Así quien la vea entra directo al artículo.</Step>
-            </ol>
+            <div className="flex flex-col gap-4">
+              <ol className="flex flex-col gap-3 text-sm">
+                <Step n={1}>
+                  Toca <strong>Compartir</strong> y elige <strong>Instagram → Historia</strong>.
+                </Step>
+                <Step n={2}>
+                  En la historia, toca el sticker <strong>Enlace</strong> y pega el link: ya te lo copiamos.
+                </Step>
+                <Step n={3}>
+                  Ponlo encima del recuadro negro: así quien la vea entra directo al artículo.
+                </Step>
+              </ol>
+              <button
+                type="button"
+                onClick={() => build(randomPhrase(phrase ?? undefined))}
+                disabled={!file && !failed}
+                className="inline-flex min-h-11 items-center gap-2 self-start rounded-full bg-chip-off px-4 text-sm font-bold text-ink transition-colors hover:bg-line disabled:opacity-60"
+              >
+                <RefreshCw className="size-4" aria-hidden /> Otra frase
+              </button>
+            </div>
           </div>
 
           {failed && (
@@ -181,7 +205,11 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
               onClick={copyLink}
               className="flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-button)] bg-chip-off font-bold text-ink transition-colors hover:bg-line"
             >
-              {copied ? <Check className="size-4 text-accent" aria-hidden /> : <Copy className="size-4" aria-hidden />}
+              {copied ? (
+                <Check className="size-4 text-accent" aria-hidden />
+              ) : (
+                <Copy className="size-4" aria-hidden />
+              )}
               <span aria-live="polite">{copied ? "¡Link copiado!" : "Copiar link"}</span>
             </button>
             {!canShareFiles && file && (

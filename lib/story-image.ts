@@ -4,6 +4,29 @@
  * Arriba y abajo quedan márgenes libres porque Instagram tapa esas zonas con su interfaz.
  */
 
+/**
+ * Frases de la línea chica del recuadro negro, donde se pega el sticker "Enlace".
+ * Varían entre historia e historia para que no se vean todas iguales.
+ */
+export const STORY_PHRASES = [
+  "Toca el enlace para verlo",
+  "¿Lo quieres? Toca el enlace",
+  "Toca el enlace y escríbeme",
+  "Más fotos y detalles en el enlace",
+  "Toca el enlace antes de que se vaya",
+  "Míralo en mi tienda: toca el enlace",
+  "Toca el enlace para ver el precio y más",
+  "¿Te interesa? Toca el enlace",
+  "Toca el enlace y mira más cosas",
+  "Lo vendo: toca el enlace",
+] as const;
+
+/** Una frase al azar, distinta de `previous` si se pasa. */
+export function randomPhrase(previous?: string) {
+  const options = STORY_PHRASES.filter((phrase) => phrase !== previous);
+  return options[Math.floor(Math.random() * options.length)];
+}
+
 export type StoryData = {
   photoUrl: string | null;
   title: string;
@@ -11,6 +34,8 @@ export type StoryData = {
   condition: string;
   /** "reutilizalo.shop/nick" */
   linkLabel: string;
+  /** Una de STORY_PHRASES. */
+  phrase: string;
   accent: string;
 };
 
@@ -198,9 +223,9 @@ export async function renderStoryImage(data: StoryData): Promise<Blob> {
   ctx.fillStyle = COLORS.ink;
   roundedRect(ctx, pill.x, pill.y, pill.w, pill.h, 44);
   ctx.fill();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-  ctx.font = `500 32px ${sans}`;
-  ctx.fillText("Lo encuentras en", pill.x + 48, pill.y + 26);
+  ctx.fillStyle = "#ffd45c";
+  fitFont(ctx, data.phrase, 700, 34, sans, pill.w - 96);
+  ctx.fillText(data.phrase, pill.x + 48, pill.y + 24);
   ctx.fillStyle = COLORS.surface;
   fitFont(ctx, data.linkLabel, 800, 52, display, pill.w - 96);
   ctx.fillText(data.linkLabel, pill.x + 48, pill.y + 72);
