@@ -7,6 +7,7 @@ import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { nickProblem, normalizeNick, NICK_PROBLEM_MESSAGES, type NickProblem } from "@/lib/nick";
 import { toE164 } from "@/lib/format";
 import { safeNextPath } from "@/lib/safe-next";
+import { SITE_URL } from "@/lib/site";
 
 // ---------------------------------------------------------------------
 // Disponibilidad del nick (se llama en vivo desde /crear)
@@ -93,7 +94,7 @@ export async function createStore(
     return { errors: { nick: NICK_PROBLEM_MESSAGES.taken } };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ? SITE_URL : "http://localhost:3000";
   const { data, error } = await supabase.auth.signUp({
     email,
     password,

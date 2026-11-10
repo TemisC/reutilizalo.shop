@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -14,7 +15,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://reutilizalo.shop"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Reutilizalo — Tu tiendita de cosas usadas",
     template: "%s · Reutilizalo",
