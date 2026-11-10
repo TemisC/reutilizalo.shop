@@ -26,19 +26,67 @@ function fontFamilies() {
   return { display, sans };
 }
 
-/** La foto pasa por el optimizador de Next: así llega del mismo dominio y el canvas la puede exportar. */
-function loadPhoto(url: string): Promise<HTMLImageElement> {
+function loadImage(src: string, crossOrigin: boolean): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("No se pudo cargar la foto"));
-    image.src = `/_next/image?url=${encodeURIComponent(url)}&w=1080&q=75`;
+    if (crossOrigin) image.crossOrigin = "anonymous";
+    const timer = setTimeout(() => reject(new Error("foto: tardó demasiado")), 12000);
+    image.onload = () => {
+      clearTimeout(timer);
+      resolve(image);
+    };
+    image.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error("foto: no cargó"));
+    };
+    image.src = src;
   });
 }
 
+/**
+ * La foto pasa primero por el optimizador de Next (mismo dominio, el canvas la puede exportar);
+ * si falla, se pide directo a Supabase con CORS. Sin foto, la historia sale igual.
+ */
+async function loadPhoto(url: string): Promise<HTMLImageElement | null> {
+  try {
+    return await loadImage(`/_next/image?url=${encodeURIComponent(url)}&w=1080&q=75`, false);
+  } catch {
+    return loadImage(url, true).catch(() => null);
+  }
+}
+
+/** Rectángulo redondeado sin ctx.roundRect, que algunos navegadores de celular no tienen. */
 function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/** Espera las fuentes de la app, pero sin trabar la imagen si el navegador no responde. */
+async function loadFonts(display: string, sans: string) {
+  if (!document.fonts?.load) return;
+  const fonts = Promise.all([document.fonts.load(`800 100px ${display}`), document.fonts.load(`700 40px ${sans}`)]);
+  await Promise.race([fonts.catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 3000))]);
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const fromDataUrl = () => {
+      try {
+        const [header, base64] = canvas.toDataURL("image/png").split(",");
+        const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+        resolve(new Blob([bytes], { type: header.match(/:(.*?);/)?.[1] ?? "image/png" }));
+      } catch (error) {
+        reject(new Error(`exportar: ${error instanceof Error ? error.message : "falló"}`));
+      }
+    };
+    if (!canvas.toBlob) return fromDataUrl();
+    canvas.toBlob((blob) => (blob ? resolve(blob) : fromDataUrl()), "image/png");
+  });
 }
 
 /** Corta el texto en hasta `maxLines` renglones; el último lleva "…" si no entra. */
@@ -77,16 +125,13 @@ function fitFont(ctx: CanvasRenderingContext2D, text: string, weight: number, si
 
 export async function renderStoryImage(data: StoryData): Promise<Blob> {
   const { display, sans } = fontFamilies();
-  await Promise.all([
-    document.fonts.load(`800 100px ${display}`),
-    document.fonts.load(`700 40px ${sans}`),
-  ]);
-  const photo = data.photoUrl ? await loadPhoto(data.photoUrl).catch(() => null) : null;
+  const [, photo] = await Promise.all([loadFonts(display, sans), data.photoUrl ? loadPhoto(data.photoUrl) : null]);
 
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas: no disponible");
   ctx.textBaseline = "top";
 
   ctx.fillStyle = COLORS.canvas;
@@ -160,7 +205,5 @@ export async function renderStoryImage(data: StoryData): Promise<Blob> {
   fitFont(ctx, data.linkLabel, 800, 52, display, pill.w - 96);
   ctx.fillText(data.linkLabel, pill.x + 48, pill.y + 72);
 
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("No se pudo crear la imagen"))), "image/png"),
-  );
+  return canvasToBlob(canvas);
 }

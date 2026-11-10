@@ -21,7 +21,8 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+  /** Motivo técnico corto, visible para poder diagnosticar desde el celular. */
+  const [failed, setFailed] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [canShareFiles, setCanShareFiles] = useState(false);
 
@@ -33,7 +34,7 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
   async function open() {
     dialogRef.current?.showModal();
     if (file) return;
-    setFailed(false);
+    setFailed(null);
     try {
       // Las tiendas Pro pueden tener su propio color: se toma del botón, que está dentro del tema.
       const accent = getComputedStyle(triggerRef.current!).getPropertyValue("--accent").trim() || "#17784b";
@@ -43,9 +44,9 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
       });
       setFile(next);
       setPreview(URL.createObjectURL(blob));
-      setCanShareFiles(typeof navigator.canShare === "function" && navigator.canShare({ files: [next] }));
-    } catch {
-      setFailed(true);
+      setCanShareFiles(canShareFile(next));
+    } catch (error) {
+      setFailed(error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -152,7 +153,10 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
           </div>
 
           {failed && (
-            <p className="text-sm text-red-700">No pudimos armar la imagen. Prueba de nuevo en un rato.</p>
+            <p className="text-sm text-red-700">
+              No pudimos armar la imagen. Prueba de nuevo en un rato.{" "}
+              <span className="text-ink-muted">({failed})</span>
+            </p>
           )}
 
           <div className="flex flex-col gap-3">
@@ -190,6 +194,15 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
       </dialog>
     </>
   );
+}
+
+/** Algunos navegadores tiran error en vez de responder "no" cuando no pueden compartir archivos. */
+function canShareFile(file: File) {
+  try {
+    return typeof navigator.canShare === "function" && navigator.canShare({ files: [file] });
+  } catch {
+    return false;
+  }
 }
 
 function Step({ n, children }: { n: number; children: ReactNode }) {
