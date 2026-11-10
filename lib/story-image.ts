@@ -217,24 +217,29 @@ export async function renderStoryImage(data: StoryData): Promise<Blob> {
   ctx.font = `800 104px ${display}`;
   ctx.fillText(data.price, 90, priceTop);
 
-  // Recuadro para el sticker "Enlace": la frase arriba y un espacio punteado vacío donde se pega.
+  // Recuadro para el sticker "Enlace": la frase arriba y, debajo, una línea punteada corta en el
+  // centro como guía. Es más chica que el sticker para que quede tapada sin tener que agrandarlo.
   // Va pegado al precio para que no lo tape la barra de Instagram de abajo.
   const pill = { x: 90, y: priceTop + 104 + 36, w: 900, h: 204 };
   ctx.fillStyle = COLORS.ink;
   roundedRect(ctx, pill.x, pill.y, pill.w, pill.h, 44);
   ctx.fill();
   ctx.fillStyle = "#ffd45c";
-  fitFont(ctx, data.phrase, 700, 36, sans, pill.w - 96);
-  ctx.fillText(data.phrase, pill.x + 48, pill.y + 30);
+  ctx.textAlign = "center";
+  fitFont(ctx, data.phrase, 700, 38, sans, pill.w - 96);
+  ctx.fillText(data.phrase, pill.x + pill.w / 2, pill.y + 34);
+  ctx.textAlign = "start";
 
-  const slot = { x: pill.x + 40, y: pill.y + 84, w: pill.w - 80, h: 92 };
+  const guideY = pill.y + 140;
+  const guideWidth = 320;
   ctx.save();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-  roundedRect(ctx, slot.x, slot.y, slot.w, slot.h, 28);
-  ctx.fill();
-  ctx.setLineDash([18, 12]);
+  ctx.setLineDash([16, 12]);
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.beginPath();
+  ctx.moveTo(pill.x + (pill.w - guideWidth) / 2, guideY);
+  ctx.lineTo(pill.x + (pill.w + guideWidth) / 2, guideY);
   ctx.stroke();
   ctx.restore();
 
