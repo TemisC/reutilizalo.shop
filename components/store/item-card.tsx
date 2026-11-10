@@ -4,6 +4,8 @@ import { Image as ImageIcon, MessageSquare } from "lucide-react";
 import { CONDITIONS } from "@/lib/catalog";
 import { formatUYU } from "@/lib/format";
 import type { PublicItem } from "@/lib/data/store";
+import { storeLinkLabel, storeUrl } from "@/lib/site";
+import { StoryShareButton } from "./story-share-button";
 
 const PLACEHOLDER_COLORS = ["bg-[#e3ebe4]", "bg-[#f1e6d8]", "bg-[#e3e7ef]", "bg-[#ebe7df]"];
 
@@ -55,15 +57,25 @@ export function ItemCard({ item, nick, index }: { item: PublicItem; nick: string
           Ya tiene dueño
         </span>
       ) : (
-        <a
-          href={`/api/quiero/${item.id}`}
-          target="_blank"
-          rel="nofollow noopener"
-          className="flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-button)] bg-accent font-bold text-white transition-colors hover:bg-accent-hover"
-        >
-          <MessageSquare className="hidden size-4 lg:block" aria-hidden />
-          Lo quiero
-        </a>
+        <div className="flex gap-2">
+          <a
+            href={`/api/quiero/${item.id}`}
+            target="_blank"
+            rel="nofollow noopener"
+            className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[var(--radius-button)] bg-accent font-bold text-white transition-colors hover:bg-accent-hover"
+          >
+            <MessageSquare className="hidden size-4 lg:block" aria-hidden />
+            Lo quiero
+          </a>
+          <StoryShareButton
+            url={`${storeUrl(nick)}/${item.id}`}
+            photoUrl={item.mainPhotoUrl}
+            title={item.title}
+            price={formatUYU(item.priceUyu)}
+            condition={CONDITIONS[item.condition]}
+            linkLabel={storeLinkLabel(nick)}
+          />
+        </div>
       )}
     </article>
   );

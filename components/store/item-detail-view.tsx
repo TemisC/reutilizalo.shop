@@ -11,6 +11,8 @@ import { CreateStoreBanner, MadeWithFooter } from "./growth";
 import { StoreTheme } from "./store-theme";
 import { STORE_CONTAINER, StoreDesktopHeader } from "./store-desktop-header";
 import { ViewTracker } from "./view-tracker";
+import { StoryShareButton } from "./story-share-button";
+import { storeLinkLabel, storeUrl } from "@/lib/site";
 
 const KIND_LABELS = Object.fromEntries(PHOTO_SLOTS.map((slot) => [slot.kind, slot.label]));
 
@@ -64,6 +66,18 @@ export function ItemDetailView({ page, item }: { page: StorePage; item: PublicIt
                   Más info
                 </Link>
               </p>
+            )}
+
+            {!sold && (
+              <StoryShareButton
+                variant="full"
+                url={`${storeUrl(store.nick)}/${item.id}`}
+                photoUrl={item.mainPhotoUrl}
+                title={item.title}
+                price={formatUYU(item.priceUyu)}
+                condition={CONDITIONS[item.condition]}
+                linkLabel={storeLinkLabel(store.nick)}
+              />
             )}
 
             {item.defects && (
