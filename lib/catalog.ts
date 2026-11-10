@@ -45,4 +45,4 @@ export const REFERRAL_MAX_BONUS = 5;
 export const FREE_MAX_WITH_REFERRALS = 10;
 
 /** Precio mensual del Plan Pro en pesos uruguayos. Cambiarlo acá lo actualiza en toda la app. */
-export const PRO_PRICE_UYU = 490;
+export const PRO_PRICE_UYU = 290;
