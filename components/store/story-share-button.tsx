@@ -162,7 +162,7 @@ export function StoryShareButton({ url, variant = "icon", ...story }: Props) {
                   En la historia, toca el sticker <strong>Enlace</strong> y pega el link: ya te lo copiamos.
                 </Step>
                 <Step n={3}>
-                  Ponlo encima del recuadro negro: así quien la vea entra directo al artículo.
+                  Ponlo en el espacio punteado, debajo de la frase: así quien la vea entra directo al artículo.
                 </Step>
               </ol>
               <button

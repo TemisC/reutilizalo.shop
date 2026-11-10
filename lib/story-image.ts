@@ -33,8 +33,6 @@ export type StoryData = {
   title: string;
   price: string;
   condition: string;
-  /** "reutilizalo.shop/nick" */
-  linkLabel: string;
   /** Una de STORY_PHRASES. */
   phrase: string;
   accent: string;
@@ -170,12 +168,12 @@ export async function renderStoryImage(data: StoryData): Promise<Blob> {
   const totalWidth = brandWidth + ctx.measureText(".shop").width;
   const brandX = (W - totalWidth) / 2;
   ctx.fillStyle = COLORS.ink;
-  ctx.fillText(brand, brandX, 150);
+  ctx.fillText(brand, brandX, 110);
   ctx.fillStyle = data.accent;
-  ctx.fillText(".shop", brandX + brandWidth, 150);
+  ctx.fillText(".shop", brandX + brandWidth, 110);
 
   // Tarjeta con la foto.
-  const card = { x: 90, y: 250, w: 900, h: 900 };
+  const card = { x: 90, y: 210, w: 900, h: 900 };
   ctx.save();
   ctx.shadowColor = "rgba(20, 32, 26, 0.12)";
   ctx.shadowBlur = 40;
@@ -213,23 +211,32 @@ export async function renderStoryImage(data: StoryData): Promise<Blob> {
   ctx.fillStyle = COLORS.ink;
   ctx.font = `800 70px ${display}`;
   const lines = wrapLines(ctx, data.title, 900, 2);
-  lines.forEach((line, index) => ctx.fillText(line, 90, 1210 + index * 82));
-  const priceTop = 1210 + lines.length * 82 + 18;
+  lines.forEach((line, index) => ctx.fillText(line, 90, 1170 + index * 82));
+  const priceTop = 1170 + lines.length * 82 + 18;
   ctx.fillStyle = data.accent;
   ctx.font = `800 104px ${display}`;
   ctx.fillText(data.price, 90, priceTop);
 
-  // Dónde encontrarlo.
-  const pill = { x: 90, y: 1560, w: 900, h: 150 };
+  // Recuadro para el sticker "Enlace": la frase arriba y un espacio punteado vacío donde se pega.
+  // Va pegado al precio para que no lo tape la barra de Instagram de abajo.
+  const pill = { x: 90, y: priceTop + 104 + 36, w: 900, h: 204 };
   ctx.fillStyle = COLORS.ink;
   roundedRect(ctx, pill.x, pill.y, pill.w, pill.h, 44);
   ctx.fill();
   ctx.fillStyle = "#ffd45c";
-  fitFont(ctx, data.phrase, 700, 34, sans, pill.w - 96);
-  ctx.fillText(data.phrase, pill.x + 48, pill.y + 24);
-  ctx.fillStyle = COLORS.surface;
-  fitFont(ctx, data.linkLabel, 800, 52, display, pill.w - 96);
-  ctx.fillText(data.linkLabel, pill.x + 48, pill.y + 72);
+  fitFont(ctx, data.phrase, 700, 36, sans, pill.w - 96);
+  ctx.fillText(data.phrase, pill.x + 48, pill.y + 30);
+
+  const slot = { x: pill.x + 40, y: pill.y + 84, w: pill.w - 80, h: 92 };
+  ctx.save();
+  ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+  roundedRect(ctx, slot.x, slot.y, slot.w, slot.h, 28);
+  ctx.fill();
+  ctx.setLineDash([18, 12]);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+  ctx.stroke();
+  ctx.restore();
 
   return canvasToBlob(canvas);
 }

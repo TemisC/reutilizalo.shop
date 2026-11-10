@@ -4,7 +4,7 @@ import { Image as ImageIcon, MessageSquare } from "lucide-react";
 import { CONDITIONS } from "@/lib/catalog";
 import { formatUYU } from "@/lib/format";
 import type { PublicItem } from "@/lib/data/store";
-import { storeLinkLabel, storeUrl } from "@/lib/site";
+import { storeUrl } from "@/lib/site";
 import { StoryShareButton } from "./story-share-button";
 
 const PLACEHOLDER_COLORS = ["bg-[#e3ebe4]", "bg-[#f1e6d8]", "bg-[#e3e7ef]", "bg-[#ebe7df]"];
@@ -73,7 +73,6 @@ export function ItemCard({ item, nick, index }: { item: PublicItem; nick: string
             title={item.title}
             price={formatUYU(item.priceUyu)}
             condition={CONDITIONS[item.condition]}
-            linkLabel={storeLinkLabel(nick)}
           />
         </div>
       )}
