@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { PHOTO_SLOTS } from "@/lib/catalog";
+import { PHOTO_MAX, PHOTO_MIN } from "@/lib/catalog";
 import { itemInputSchema, type ItemFieldErrors } from "@/lib/validation/item";
 import { ITEM_PHOTOS_BUCKET, photoPathFromUrl, publicPhotoUrl } from "@/lib/images/storage";
 import { storeTag } from "@/lib/data/store";
@@ -19,7 +19,8 @@ function dbErrorMessage(error: { message: string }): string {
   if (error.message.includes("item_removed_by_admin")) {
     return "Este artículo fue retirado por moderación y no se puede volver a publicar.";
   }
-  if (error.message.includes("photo_limit_reached")) return "Puedes subir hasta 4 fotos.";
+  if (error.message.includes("photo_limit_reached")) return `Puedes subir hasta ${PHOTO_MAX} fotos.`;
+  if (error.message.includes("photo_minimum")) return `Sube al menos ${PHOTO_MIN} fotos.`;
   return "No pudimos guardar los cambios. Prueba de nuevo en un rato.";
 }
 
@@ -51,13 +52,16 @@ function parseItem(input: unknown, userId: string) {
   return { data: parsed.data };
 }
 
-function photoRows(itemId: string, photos: { kind: string; path: string }[]) {
-  return photos.map((photo) => ({
-    item_id: itemId,
-    kind: photo.kind,
-    url: publicPhotoUrl(photo.path),
-    position: PHOTO_SLOTS.findIndex((slot) => slot.kind === photo.kind),
-  }));
+/** Reemplaza las fotos del artículo, en orden, en una sola transacción (set_item_photos en la base). */
+function savePhotos(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  itemId: string,
+  photos: { path: string }[],
+) {
+  return supabase.rpc("set_item_photos", {
+    p_item_id: itemId,
+    p_urls: photos.map((photo) => publicPhotoUrl(photo.path)),
+  });
 }
 
 function revalidateSellerPages(sellerId: string) {
@@ -91,9 +95,7 @@ export async function createItem(input: unknown): Promise<ItemActionResult> {
 
   if (error || !created) return { message: dbErrorMessage(error ?? { message: "" }) };
 
-  const { error: photosError } = await supabase
-    .from("item_photos")
-    .insert(photoRows(created.id, item.photos));
+  const { error: photosError } = await savePhotos(supabase, created.id, item.photos);
 
   if (photosError) {
     await supabase.from("items").delete().eq("id", created.id);
@@ -129,23 +131,9 @@ export async function updateItem(itemId: string, input: unknown): Promise<ItemAc
   if (error) return { message: dbErrorMessage(error) };
   if (!updated) return { message: "No encontramos ese artículo." };
 
-  const { data: existing } = await supabase
-    .from("item_photos")
-    .select("kind, url")
-    .eq("item_id", itemId);
+  const { data: existing } = await supabase.from("item_photos").select("url").eq("item_id", itemId);
 
-  const keptKinds = item.photos.map((photo) => photo.kind);
-  const removedKinds = (existing ?? [])
-    .map((photo) => photo.kind as string)
-    .filter((kind) => !keptKinds.includes(kind as (typeof keptKinds)[number]));
-
-  if (removedKinds.length > 0) {
-    await supabase.from("item_photos").delete().eq("item_id", itemId).in("kind", removedKinds);
-  }
-
-  const { error: photosError } = await supabase
-    .from("item_photos")
-    .upsert(photoRows(itemId, item.photos), { onConflict: "item_id,kind" });
+  const { error: photosError } = await savePhotos(supabase, itemId, item.photos);
   if (photosError) return { message: dbErrorMessage(photosError) };
 
   // Borra del Storage los archivos que ya no se usan.

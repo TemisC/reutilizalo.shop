@@ -111,14 +111,14 @@ function toItem(row: ItemRow): PublicItem {
     defects: row.defects,
     status: row.status,
     photos,
-    mainPhotoUrl: photos.find((photo) => photo.kind === "main")?.url ?? photos[0]?.url ?? null,
+    mainPhotoUrl: photos[0]?.url ?? null,
   };
 }
 
 const PROFILE_COLUMNS =
   "id, nick, store_name, bio, avatar_url, payment_link, city, zone, plan, plan_expires_at, accent_color, show_explore_link";
 const ITEM_COLUMNS =
-  "id, title, description, price_uyu, category, condition, defects, status, item_photos (kind, url, position)";
+  "id, title, description, price_uyu, category, condition, defects, status, item_photos (url, position)";
 
 /** Todo lo que necesita la tienda pública. Cacheado; se invalida con storeTag(sellerId). */
 export async function getStorePage(nick: string): Promise<StorePage | null> {

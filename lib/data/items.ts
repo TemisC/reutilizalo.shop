@@ -1,9 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Category, Condition, PhotoKind } from "@/lib/catalog";
+import type { Category, Condition } from "@/lib/catalog";
 
 export type ItemStatus = "active" | "sold" | "hidden" | "removed_by_admin";
 
-export type ItemPhoto = { kind: PhotoKind; url: string; position: number };
+/** Ordenadas por position: la primera es la principal. */
+export type ItemPhoto = { url: string; position: number };
 
 export type SellerItem = {
   id: string;
@@ -37,7 +38,7 @@ type ItemRow = {
 };
 
 const ITEM_COLUMNS =
-  "id, title, description, price_uyu, category, condition, defects, status, item_photos (kind, url, position), want_clicks:item_events (count), views:item_events (count)";
+  "id, title, description, price_uyu, category, condition, defects, status, item_photos (url, position), want_clicks:item_events (count), views:item_events (count)";
 
 function toSellerItem(row: ItemRow): SellerItem {
   const photos = [...(row.item_photos ?? [])].sort((a, b) => a.position - b.position);
@@ -51,7 +52,7 @@ function toSellerItem(row: ItemRow): SellerItem {
     defects: row.defects,
     status: row.status,
     photos,
-    mainPhotoUrl: photos.find((photo) => photo.kind === "main")?.url ?? photos[0]?.url ?? null,
+    mainPhotoUrl: photos[0]?.url ?? null,
     interestedCount: row.want_clicks?.[0]?.count ?? 0,
     viewCount: row.views?.[0]?.count ?? 0,
   };

@@ -33,7 +33,7 @@ Mercado inicial: Uruguay (Montevideo). Moneda: pesos uruguayos, formato `$U 1.20
 | | Gratis | Pro |
 |---|---|---|
 | Artículos activos | 5 | 50 |
-| Fotos por artículo | 4 | 4 |
+| Fotos por artículo | 3 a 8 | 3 a 8 |
 | Link `reutilizalo.shop/nick` | Sí | Sí |
 | Aparece en Explorar | Ver regla de lanzamiento | Sí |
 | Color de la tienda | Verde por defecto | Elegible |
@@ -181,10 +181,10 @@ Este es un punto clave para la confianza de la comunidad. Incluir:
   > **¿Tu producto tiene algún detalle? Sácale foto.**
   > Que se vea: así tu comprador (o tu amiga) sabe exactamente lo que está comprando, y tú no te ganas una baja reputación.
   > Queremos una comunidad de economía circular sana, donde todos quedemos contentos.
-- **4 espacios de foto con nombre**: Principal (obligatoria), Otro ángulo, Etiqueta o talle, **Detalles o desgaste** (marcado como "Recomendado").
+- **Fotos: mínimo 3, hasta 8.** Se pueden elegir varias a la vez desde la galería; la primera es la principal y se puede cambiar con la estrella. Los consejos piden sacarle foto de cerca a cualquier detalle.
 - Consejos bajo las fotos: usar luz natural y fondo liso; subir fotos reales propias, nunca de internet; mostrar manchas, raspones o roturas tal como están.
 - Campos: título, precio ($U), categoría, estado (chips de selección única), "¿Tiene algún detalle? Cuéntalo" (texto).
-- **Regla suave de honestidad:** si el estado es "Buen estado" o "Con detalles" y no hay foto de tipo `defect` ni texto en `defects`, mostrar un aviso antes de publicar: "Contar los detalles evita malentendidos y cuida tu reputación. ¿Publicar igual?". No bloquear.
+- **Regla suave de honestidad:** si el estado es "Buen estado" o "Con detalles" y no hay texto en `defects`, mostrar un aviso antes de publicar: "Contar los detalles evita malentendidos y cuida tu reputación. ¿Publicar igual?". No bloquear.
 - **Casilla obligatoria:** "Confirmo que las fotos son reales y muestran el estado actual del producto". Sin ella no se puede publicar.
 - Validar el límite del plan en el servidor.
 
@@ -308,7 +308,7 @@ Las fotos de los JPG son espacios marcados; en la app van las fotos reales. Los 
 
 - RLS en todas las tablas; validar límites de plan y propiedad en el servidor.
 - Tokens de calificación aleatorios y criptográficamente seguros.
-- Límite de subida: 4 fotos por artículo, 5 MB cada una antes de comprimir; aceptar solo imágenes.
+- Límite de subida: de 3 a 8 fotos por artículo, 5 MB cada una antes de comprimir; aceptar solo imágenes.
 - Página de **Términos de uso**: Reutilizalo es una plataforma que conecta personas; cada vendedor es responsable de lo que publica y de la venta; no se procesan pagos; lista de artículos prohibidos (armas, medicamentos, animales, productos falsificados, alimentos, etc.); reglas de la comunidad sobre fotos reales y descripciones honestas.
 - Página de **Privacidad**: qué datos se guardan (email, WhatsApp, contacto opcional del comprador) y para qué.
 - Botón "Reportar artículo" en el detalle de cada artículo.

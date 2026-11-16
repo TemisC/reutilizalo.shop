@@ -37,7 +37,7 @@ En Tailwind: diseño de celular por defecto y cambios con los prefijos `md:` y `
 
 ### Publicar `/panel/publicar` — ver `11-publicar-articulo-desktop.jpg`
 - Mismo menú lateral del panel.
-- **Izquierda:** formulario con los 4 espacios de foto en una fila, título/precio/categoría en una fila, estado y detalles.
+- **Izquierda:** formulario con la grilla de fotos (4 por fila), título/precio/categoría en una fila, estado y detalles.
 - **Derecha (320 px):** banner amarillo de honestidad de las fotos, **vista previa en vivo** "Así se verá en tu tienda" (se actualiza al escribir título, precio y estado), casilla de confirmación y botón Publicar.
 
 ### Página de inicio `/` — ver `04-inicio-desktop.jpg`

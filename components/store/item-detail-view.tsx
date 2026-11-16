@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Image as ImageIcon, Star } from "lucide-react";
-import { CONDITIONS, PHOTO_SLOTS } from "@/lib/catalog";
+import { CONDITIONS } from "@/lib/catalog";
 import { formatScore, formatUYU } from "@/lib/format";
 import { isReputationVisible } from "@/lib/reputation";
 import type { PublicItem, StorePage } from "@/lib/data/store";
@@ -13,8 +13,6 @@ import { STORE_CONTAINER, StoreDesktopHeader } from "./store-desktop-header";
 import { ViewTracker } from "./view-tracker";
 import { StoryShareButton } from "./story-share-button";
 import { storeUrl } from "@/lib/site";
-
-const KIND_LABELS = Object.fromEntries(PHOTO_SLOTS.map((slot) => [slot.kind, slot.label]));
 
 export function ItemDetailView({ page, item }: { page: StorePage; item: PublicItem }) {
   const { store, reputation } = page;
@@ -141,21 +139,21 @@ function PhotoGallery({ item }: { item: PublicItem }) {
     <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0">
       {item.photos.map((photo, index) => (
         <figure
-          key={photo.kind}
+          key={photo.url}
           className={`relative aspect-square shrink-0 snap-center overflow-hidden rounded-3xl bg-surface ${
             item.photos.length === 1 ? "w-full" : "w-[85%]"
           } lg:w-auto ${index === 0 ? "lg:col-span-3" : ""}`}
         >
           <Image
             src={photo.url}
-            alt={`${item.title} — ${KIND_LABELS[photo.kind]}`}
+            alt={`${item.title} — foto ${index + 1}`}
             fill
             sizes={index === 0 ? "(max-width: 1023px) 90vw, 560px" : "(max-width: 1023px) 90vw, 190px"}
             priority={index === 0}
             className={`object-cover ${item.status === "sold" ? "grayscale" : ""}`}
           />
           <figcaption className="absolute bottom-3 left-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-bold text-white">
-            {KIND_LABELS[photo.kind]} · {index + 1}/{item.photos.length}
+            {index + 1}/{item.photos.length}
           </figcaption>
         </figure>
       ))}

@@ -54,7 +54,7 @@ async function EditItemContent({ params }: { params: Promise<{ id: string }> }) 
         honestyConfirmed: false,
         photos: item.photos.flatMap((photo) => {
           const path = photoPathFromUrl(photo.url);
-          return path ? [{ kind: photo.kind, path, url: photo.url }] : [];
+          return path ? [{ path, url: photo.url }] : [];
         }),
       }}
     />

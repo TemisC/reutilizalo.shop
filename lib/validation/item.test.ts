@@ -10,7 +10,7 @@ const valid = {
   condition: "muy_buen_estado",
   defects: "",
   honestyConfirmed: true,
-  photos: [{ kind: "main", path: `${uid}/abc-123.webp` }],
+  photos: ["a", "b", "c"].map((name) => ({ path: `${uid}/${name}-123.webp` })),
 };
 
 describe("itemInputSchema", () => {
@@ -24,25 +24,20 @@ describe("itemInputSchema", () => {
     expect(itemInputSchema.safeParse({ ...valid, honestyConfirmed: false }).success).toBe(false);
   });
 
-  it("exige la foto principal", () => {
-    const result = itemInputSchema.safeParse({
-      ...valid,
-      photos: [{ kind: "angle", path: `${uid}/abc.webp` }],
-    });
-    expect(result.success).toBe(false);
+  it("exige entre 3 y 8 fotos", () => {
+    const photos = (count: number) =>
+      Array.from({ length: count }, (_, i) => ({ path: `${uid}/foto-${i}.webp` }));
+    expect(itemInputSchema.safeParse({ ...valid, photos: photos(2) }).success).toBe(false);
+    expect(itemInputSchema.safeParse({ ...valid, photos: photos(8) }).success).toBe(true);
+    expect(itemInputSchema.safeParse({ ...valid, photos: photos(9) }).success).toBe(false);
   });
 
-  it("rechaza más de 4 fotos, fotos repetidas y rutas raras", () => {
-    const photo = (kind: string) => ({ kind, path: `${uid}/x.webp` });
+  it("rechaza fotos repetidas y rutas raras", () => {
+    const photo = { path: `${uid}/x.webp` };
+    expect(itemInputSchema.safeParse({ ...valid, photos: [photo, photo, photo] }).success).toBe(false);
     expect(
-      itemInputSchema.safeParse({
-        ...valid,
-        photos: ["main", "angle", "label", "defect", "main"].map(photo),
-      }).success,
-    ).toBe(false);
-    expect(itemInputSchema.safeParse({ ...valid, photos: [photo("main"), photo("main")] }).success).toBe(false);
-    expect(
-      itemInputSchema.safeParse({ ...valid, photos: [{ kind: "main", path: "../otro/x.webp" }] }).success,
+      itemInputSchema.safeParse({ ...valid, photos: [...valid.photos.slice(1), { path: "../otro/x.webp" }] })
+        .success,
     ).toBe(false);
   });
 
