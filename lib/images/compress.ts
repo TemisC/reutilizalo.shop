@@ -36,13 +36,19 @@ export async function compressImage(file: File): Promise<CompressedImage> {
   context.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
 
-  const webp = await toBlob(canvas, "image/webp");
-  // Algunos Safari viejos ignoran WebP y devuelven PNG: en ese caso, JPEG.
-  if (webp && webp.type === "image/webp") return { blob: webp, extension: "webp" };
+  try {
+    const webp = await toBlob(canvas, "image/webp");
+    // Algunos Safari viejos ignoran WebP y devuelven PNG: en ese caso, JPEG.
+    if (webp && webp.type === "image/webp") return { blob: webp, extension: "webp" };
 
-  const jpeg = await toBlob(canvas, "image/jpeg");
-  if (!jpeg) throw new ImageValidationError("Tu navegador no pudo procesar la foto.");
-  return { blob: jpeg, extension: "jpg" };
+    const jpeg = await toBlob(canvas, "image/jpeg");
+    if (!jpeg) throw new ImageValidationError("Tu navegador no pudo procesar la foto.");
+    return { blob: jpeg, extension: "jpg" };
+  } finally {
+    // Libera la memoria del canvas enseguida: al subir varias fotos seguidas, el celular la necesita.
+    canvas.width = 0;
+    canvas.height = 0;
+  }
 }
 
 function toBlob(canvas: HTMLCanvasElement, type: string) {

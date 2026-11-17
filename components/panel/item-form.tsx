@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Camera, Image as ImageIcon, ImagePlus, LoaderCircle, Star, TriangleAlert, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { compressImage, ImageValidationError } from "@/lib/images/compress";
+import { compressImage, ImageValidationError, type CompressedImage } from "@/lib/images/compress";
 import { ITEM_PHOTOS_BUCKET } from "@/lib/images/storage";
 import {
   CATEGORIES,
@@ -31,8 +31,20 @@ type InitialItem = Omit<ItemInput, "photos"> & {
   photos: { path: string; url: string }[];
 };
 
-/** Fotos que se comprimen y suben a la vez: más trabaría los celulares con poca memoria. */
-const PARALLEL_UPLOADS = 3;
+/** crypto.randomUUID no existe en navegadores de celular algo viejos. */
+function newId() {
+  return typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+}
+
+/** Para que ninguna foto quede "subiendo" para siempre si el celular o la red se traban. */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
 
 type Props = {
   userId: string;
@@ -57,7 +69,7 @@ export function ItemForm({ userId, itemId, initial }: Props) {
   );
   const [photos, setPhotos] = useState<PhotoState[]>(() =>
     (initial?.photos ?? []).map((photo) => ({
-      id: crypto.randomUUID(),
+      id: newId(),
       status: "ready",
       previewUrl: photo.url,
       path: photo.path,
@@ -68,7 +80,6 @@ export function ItemForm({ userId, itemId, initial }: Props) {
   const [result, setResult] = useState<ItemActionResult>({});
   const [honestyWarning, setHonestyWarning] = useState(false);
   const [pending, startTransition] = useTransition();
-  const fileInput = useRef<HTMLInputElement>(null);
   const defectsRef = useRef<HTMLTextAreaElement>(null);
 
   // Libera las URLs locales de las vistas previas al salir.
@@ -103,40 +114,58 @@ export function ItemForm({ userId, itemId, initial }: Props) {
         : null,
     );
 
-    const queue = files.slice(0, free).map((file) => ({ id: crypto.randomUUID(), file }));
+    const queue = files.slice(0, free).map((file) => ({ id: newId(), file }));
     setPhotos((current) => [...current, ...queue.map(({ id }) => ({ id, status: "uploading" as const }))]);
-    const worker = async () => {
-      for (let next = queue.shift(); next; next = queue.shift()) await uploadPhoto(next.id, next.file);
-    };
-    for (let k = 0; k < Math.min(PARALLEL_UPLOADS, queue.length); k++) worker();
+    processQueue(queue);
   }
 
-  async function uploadPhoto(id: string, file: File) {
-    let previewUrl: string | undefined;
-    try {
-      const compressed = await compressImage(file);
-      previewUrl = URL.createObjectURL(compressed.blob);
-      updatePhoto(id, { id, status: "uploading", previewUrl });
+  /**
+   * Las fotos se achican de a una: decodificar varias fotos de cámara a la vez llena la memoria del
+   * celular y congela la página. La subida de cada una sigue en segundo plano mientras se achica la siguiente.
+   */
+  async function processQueue(queue: { id: string; file: File }[]) {
+    for (const { id, file } of queue) {
+      let compressed: CompressedImage;
+      try {
+        compressed = await withTimeout(compressImage(file), 30_000);
+      } catch (error) {
+        failPhoto(id, error);
+        continue;
+      }
+      uploadPhoto(id, compressed);
+    }
+  }
 
-      const path = `${userId}/${crypto.randomUUID()}.${compressed.extension}`;
+  function failPhoto(id: string, error: unknown, previewUrl?: string) {
+    updatePhoto(id, {
+      id,
+      status: "error",
+      previewUrl,
+      error:
+        error instanceof ImageValidationError
+          ? error.message
+          : "No se subió. Revisa tu conexión, quítala y vuelve a agregarla.",
+    });
+  }
+
+  async function uploadPhoto(id: string, compressed: CompressedImage) {
+    const previewUrl = URL.createObjectURL(compressed.blob);
+    updatePhoto(id, { id, status: "uploading", previewUrl });
+    try {
+      const path = `${userId}/${newId()}.${compressed.extension}`;
       const supabase = createClient();
-      const { error } = await supabase.storage.from(ITEM_PHOTOS_BUCKET).upload(path, compressed.blob, {
-        contentType: compressed.blob.type,
-        upsert: false,
-      });
+      const { error } = await withTimeout(
+        supabase.storage.from(ITEM_PHOTOS_BUCKET).upload(path, compressed.blob, {
+          contentType: compressed.blob.type,
+          upsert: false,
+        }),
+        90_000,
+      );
       if (error) throw error;
 
       updatePhoto(id, { id, status: "ready", previewUrl, path, isNew: true });
     } catch (error) {
-      updatePhoto(id, {
-        id,
-        status: "error",
-        previewUrl,
-        error:
-          error instanceof ImageValidationError
-            ? error.message
-            : "No pudimos subir la foto. Revisa tu conexión y prueba de nuevo.",
-      });
+      failPhoto(id, error, previewUrl);
     }
   }
 
@@ -210,22 +239,9 @@ export function ItemForm({ userId, itemId, initial }: Props) {
             <legend className="mb-3 flex w-full items-baseline justify-between gap-3 font-bold text-ink">
               Fotos
               <span className="text-sm font-normal text-ink-muted">
-                Mínimo {PHOTO_MIN}, hasta {PHOTO_MAX} · {photos.length}/{PHOTO_MAX}
+                {`Mínimo ${PHOTO_MIN}, hasta ${PHOTO_MAX} · ${photos.length}/${PHOTO_MAX}`}
               </span>
             </legend>
-            <input
-              ref={fileInput}
-              type="file"
-              accept="image/*"
-              multiple
-              className="sr-only"
-              tabIndex={-1}
-              aria-hidden
-              onChange={(event) => {
-                handleFiles(event.target.files);
-                event.target.value = "";
-              }}
-            />
             <div className="grid grid-cols-3 gap-2.5 lg:grid-cols-4 lg:gap-3">
               {photos.map((photo, index) => (
                 <PhotoTile
@@ -237,10 +253,10 @@ export function ItemForm({ userId, itemId, initial }: Props) {
                 />
               ))}
               {photos.length < PHOTO_MAX && (
-                <button
-                  type="button"
-                  onClick={() => fileInput.current?.click()}
-                  className={`flex flex-col items-center justify-center gap-1.5 rounded-3xl border-2 border-dashed p-2 text-center transition-colors ${
+                // Un <label> con el input adentro abre la galería sin depender de .click() por código,
+                // que algunos celulares ignoran al volver del selector de fotos.
+                <label
+                  className={`relative flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-3xl border-2 border-dashed p-2 text-center transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent ${
                     photos.length === 0
                       ? "col-span-3 min-h-40 border-accent bg-accent/5 hover:bg-accent/10 lg:col-span-4"
                       : "aspect-square border-line bg-surface hover:bg-chip-off"
@@ -251,9 +267,21 @@ export function ItemForm({ userId, itemId, initial }: Props) {
                     {photos.length === 0 ? "Agregar fotos" : "Agregar"}
                   </span>
                   {photos.length === 0 && (
-                    <span className="text-sm text-ink-muted">Puedes elegir varias a la vez</span>
+                    <span className="text-sm text-ink-muted">
+                      Puedes elegir varias a la vez: mantén presionada una foto y marca las demás
+                    </span>
                   )}
-                </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="sr-only"
+                    onChange={(event) => {
+                      handleFiles(event.target.files);
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
               )}
             </div>
             {photoNotice && <p className="text-sm text-ink-muted">{photoNotice}</p>}
@@ -553,7 +581,7 @@ function PhotoTile({
       {photo.status === "error" && (
         <span
           role="alert"
-          className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2 pt-10 text-center text-xs text-red-700"
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden p-2 pt-9 text-center text-[11px] leading-tight text-red-700"
         >
           <TriangleAlert className="size-5 shrink-0" aria-hidden />
           {photo.error}
