@@ -144,7 +144,7 @@ export function ItemForm({ userId, itemId, initial }: Props) {
       error:
         error instanceof ImageValidationError
           ? error.message
-          : "No se subió. Revisa tu conexión, quítala y vuelve a agregarla.",
+          : "Algunas fotos no se subieron: revisa tu conexión.",
     });
   }
 
@@ -187,6 +187,9 @@ export function ItemForm({ userId, itemId, initial }: Props) {
     });
   }
 
+  const photoErrors = [
+    ...new Set(photos.flatMap((photo) => (photo.status === "error" ? [photo.error] : []))),
+  ];
   const readyCount = photos.filter((photo) => photo.status === "ready").length;
   const missingPhotos = Math.max(0, PHOTO_MIN - readyCount);
 
@@ -253,8 +256,8 @@ export function ItemForm({ userId, itemId, initial }: Props) {
                 />
               ))}
               {photos.length < PHOTO_MAX && (
-                // Un <label> con el input adentro abre la galería sin depender de .click() por código,
-                // que algunos celulares ignoran al volver del selector de fotos.
+                // El input transparente cubre todo el recuadro: el toque cae directo sobre él, sin depender de
+                // .click() por código ni de que el navegador asocie el label (falla en algunos celulares).
                 <label
                   className={`relative flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-3xl border-2 border-dashed p-2 text-center transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent ${
                     photos.length === 0
@@ -275,7 +278,8 @@ export function ItemForm({ userId, itemId, initial }: Props) {
                     type="file"
                     accept="image/*"
                     multiple
-                    className="sr-only"
+                    aria-label="Agregar fotos"
+                    className="absolute inset-0 size-full cursor-pointer opacity-0"
                     onChange={(event) => {
                       handleFiles(event.target.files);
                       event.target.value = "";
@@ -285,6 +289,11 @@ export function ItemForm({ userId, itemId, initial }: Props) {
               )}
             </div>
             {photoNotice && <p className="text-sm text-ink-muted">{photoNotice}</p>}
+            {photoErrors.length > 0 && (
+              <p role="alert" className="text-sm text-red-700">
+                {photoErrors.join(" ")} Quita las marcadas con la X y vuelve a agregarlas.
+              </p>
+            )}
             {errors.photos && <FieldError id="photos-error">{errors.photos}</FieldError>}
             <ul className="flex flex-col gap-1 text-sm text-ink-soft">
               <li>· Usa luz natural y un fondo liso.</li>
@@ -579,12 +588,10 @@ function PhotoTile({
       )}
 
       {photo.status === "error" && (
-        <span
-          role="alert"
-          className="absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden p-2 pt-9 text-center text-[11px] leading-tight text-red-700"
-        >
+        // El motivo completo va debajo de la grilla: acá no entra en celulares angostos.
+        <span className="absolute inset-x-0 bottom-0 top-8 flex flex-col items-center justify-center gap-1 p-1 text-center text-xs font-bold text-red-700">
           <TriangleAlert className="size-5 shrink-0" aria-hidden />
-          {photo.error}
+          No se subió
         </span>
       )}
 

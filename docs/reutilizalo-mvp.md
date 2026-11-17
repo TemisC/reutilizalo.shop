@@ -308,7 +308,7 @@ Las fotos de los JPG son espacios marcados; en la app van las fotos reales. Los 
 
 - RLS en todas las tablas; validar límites de plan y propiedad en el servidor.
 - Tokens de calificación aleatorios y criptográficamente seguros.
-- Límite de subida: de 3 a 8 fotos por artículo, 5 MB cada una antes de comprimir; aceptar solo imágenes.
+- Límite de subida: de 3 a 8 fotos por artículo, hasta 25 MB cada una antes de comprimir (se suben achicadas); aceptar solo imágenes.
 - Página de **Términos de uso**: Reutilizalo es una plataforma que conecta personas; cada vendedor es responsable de lo que publica y de la venta; no se procesan pagos; lista de artículos prohibidos (armas, medicamentos, animales, productos falsificados, alimentos, etc.); reglas de la comunidad sobre fotos reales y descripciones honestas.
 - Página de **Privacidad**: qué datos se guardan (email, WhatsApp, contacto opcional del comprador) y para qué.
 - Botón "Reportar artículo" en el detalle de cada artículo.
